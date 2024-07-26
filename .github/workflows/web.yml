@@ -1,0 +1,51 @@
+name: Web App CI/CD
+run-name: ${{ github.actor }} is building Web App CI/CD 🚀
+on:
+  push:
+    paths:
+      - 'apps/web/**'
+    branches:
+      - 'main/**'
+jobs:
+  Build-Web-App:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+          working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v3 
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build      
+      - name: Build and push Google Artifact Registry image
+        uses: RafikFarhad/push-to-gcr-github-action@v5-rc1
+        with:
+          gcloud_service_key: ${{ secrets.GOOGLE_CREDENTIALS }}
+          registry: asia-southeast1-docker.pkg.dev
+          project_id: kahero-8dfde/kahero
+          image_name: graphql-server
+          image_tag: staging, ${{ github.sha }}
+          context: apps/web 
+
+      # - name: Authenticate with Google Cloud
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     project_id: kahero-8dfde
+      #     credentials_json: ${{ secrets.GCP_SERVICE_JSON }}
+
+      # - name: Deploy to Cloud Run
+      #   id: 'deploy'
+      #   uses: 'google-github-actions/deploy-cloudrun@v2'
+      #   with:
+      #     service: 'graphql-server-staging'
+      #     image: 'asia-southeast1-docker.pkg.dev/kahero-8dfde/kahero/graphql-server:${{ github.sha }}'
+      #     project_id: 'kahero-8dfde'
+      #     region: 'asia-east1'
+
+      # - name: 'Curl the deployed service'
+      #   run: 'curl "${{ steps.deploy.outputs.url }}"'          
