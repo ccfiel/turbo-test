@@ -21,7 +21,8 @@ jobs:
           node-version: 20
       - uses: pnpm/action-setup@v3 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run build      
+      - run: pnpm run build    
+      - run: ls -la  
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
