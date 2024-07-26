@@ -4,7 +4,6 @@ WORKDIR /usr/src/app
  
 # Copy root package.json and lockfile
 COPY package.json ./
-COPY package-lock.json ./
  
 RUN npm install
  
