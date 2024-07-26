@@ -22,15 +22,12 @@ jobs:
       - uses: pnpm/action-setup@v3 
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build      
-      - name: Build and push Google Artifact Registry image
-        uses: RafikFarhad/push-to-gcr-github-action@v5-rc1
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          gcloud_service_key: ${{ secrets.GOOGLE_CREDENTIALS }}
-          registry: asia-southeast1-docker.pkg.dev
-          project_id: kahero-8dfde/kahero
-          image_name: graphql-server
-          image_tag: staging, ${{ github.sha }}
-          context: apps/web 
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Authenticate with Google Cloud
       #   uses: 'google-github-actions/auth@v2'
