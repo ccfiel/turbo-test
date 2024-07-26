@@ -5,7 +5,7 @@ on:
     paths:
       - 'apps/web/**'
     branches:
-      - 'main/**'
+      - 'main'
 jobs:
   Build-Web-App:
     runs-on: ubuntu-latest
