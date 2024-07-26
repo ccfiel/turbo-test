@@ -29,20 +29,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Authenticate with Google Cloud
-      #   uses: 'google-github-actions/auth@v2'
-      #   with:
-      #     project_id: kahero-8dfde
-      #     credentials_json: ${{ secrets.GCP_SERVICE_JSON }}
-
-      # - name: Deploy to Cloud Run
-      #   id: 'deploy'
-      #   uses: 'google-github-actions/deploy-cloudrun@v2'
-      #   with:
-      #     service: 'graphql-server-staging'
-      #     image: 'asia-southeast1-docker.pkg.dev/kahero-8dfde/kahero/graphql-server:${{ github.sha }}'
-      #     project_id: 'kahero-8dfde'
-      #     region: 'asia-east1'
-
-      # - name: 'Curl the deployed service'
-      #   run: 'curl "${{ steps.deploy.outputs.url }}"'          
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ghcr.io/web
+  
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/web
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
